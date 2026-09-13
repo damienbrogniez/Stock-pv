@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#061018"><meta name="apple-mobile-web-app-title" content="Stock BTP">
+<title>Stock BTP • Énergie renouvelable</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23061018'/%3E%3Cpath d='M45 9C26 12 13 24 13 42c10-8 18-16 24-27-2 13-7 23-17 33 17 1 29-11 25-39Z' fill='%2320e6a3'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#061018;--bg2:#091923;--panel:rgba(10,28,39,.82);--panel2:#0d2330;
+  --line:rgba(94,188,219,.18);--text:#eefaff;--muted:#86a4b2;
+  --green:#20e6a3;--green2:#0bbf88;--cyan:#27c8ff;--blue:#3288ff;
+  --orange:#ffb52e;--red:#ff5e68;--purple:#a66cff;--shadow:0 18px 60px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif;
+  color:var(--text);background:
+  radial-gradient(circle at 78% 5%,rgba(32,230,163,.10),transparent 24%),
+  radial-gradient(circle at 30% 0%,rgba(39,200,255,.10),transparent 25%),
+  linear-gradient(145deg,#061018 0%,#07141d 48%,#061018 100%);
+  min-height:100vh;padding-bottom:92px;overflow-x:hidden
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.25;
+  background-image:linear-gradient(rgba(39,200,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(39,200,255,.035) 1px,transparent 1px);
+  background-size:42px 42px;mask-image:linear-gradient(to bottom,#000,transparent 85%)
+}
+header{
+  position:sticky;top:0;z-index:50;color:white;padding:18px 22px 16px;
+  background:rgba(5,17,25,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);box-shadow:0 10px 40px rgba(0,0,0,.25)
+}
+.brand{display:flex;align-items:center;gap:12px;max-width:1180px;margin:auto}
+.brand-mark{
+  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-size:23px;
+  background:linear-gradient(145deg,rgba(32,230,163,.25),rgba(39,200,255,.14));
+  border:1px solid rgba(32,230,163,.35);box-shadow:0 0 28px rgba(32,230,163,.16)
+}
+.brand h1{font-size:21px;line-height:1;margin:0;letter-spacing:.2px}
+.brand .sub{font-size:11px;color:#8eb1bf;margin-top:5px;letter-spacing:.8px;text-transform:uppercase}
+main{max-width:1180px;margin:auto;padding:22px 18px 110px;position:relative}
+.tab{display:none}.tab.active{display:block}
+.hero{
+  border:1px solid var(--line);border-radius:24px;padding:24px;margin-bottom:18px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(13,38,50,.92),rgba(7,22,31,.86));
+  box-shadow:var(--shadow)
+}
+.hero:after{content:"☀";position:absolute;right:28px;top:-16px;font-size:105px;color:rgba(255,181,46,.08)}
+.hero h2{margin:0;font-size:30px;letter-spacing:-.7px}
+.hero p{margin:8px 0 0;color:var(--muted)}
+.energy-line{display:flex;gap:8px;align-items:center;margin-top:14px;font-size:12px;color:#9ed7c4}
+.energy-line i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.card,.summary-card{
+  background:linear-gradient(145deg,rgba(12,36,49,.9),rgba(7,23,32,.86));
+  border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 10px 35px rgba(0,0,0,.18)
+}
+.card .num{font-size:28px;font-weight:800;letter-spacing:-.8px}.card .label{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.card .accent{font-size:11px;color:var(--green);margin-top:9px}
+.section{
+  background:linear-gradient(145deg,rgba(10,30,41,.92),rgba(6,20,28,.90));
+  border:1px solid var(--line);border-radius:20px;margin:14px 0;padding:18px;box-shadow:var(--shadow)
+}
+.section h2{font-size:19px;margin:0 0 14px}
+.toolbar{display:flex;gap:9px;margin:13px 0;flex-wrap:wrap}
+input,select,textarea{
+  width:100%;padding:12px 13px;border:1px solid rgba(103,182,211,.18);border-radius:12px;
+  background:#071822;color:var(--text);font-size:15px;outline:none
+}
+input:focus,select:focus{border-color:rgba(32,230,163,.55);box-shadow:0 0 0 3px rgba(32,230,163,.08)}
+button{
+  border:1px solid rgba(32,230,163,.28);border-radius:12px;padding:11px 15px;font-size:14px;font-weight:750;
+  background:linear-gradient(135deg,#19d89a,#0cae82);color:#02130d;cursor:pointer;box-shadow:0 8px 22px rgba(32,230,163,.13)
+}
+button.secondary{background:#0a202c;color:#b8d0da;border-color:rgba(103,182,211,.18);box-shadow:none}
+button.danger{background:rgba(255,94,104,.08);color:#ff8790;border-color:rgba(255,94,104,.25);box-shadow:none}
+.search{flex:1;min-width:220px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field label{display:block;font-size:11px;color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.4px}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px 8px;border-bottom:1px solid rgba(103,182,211,.11);text-align:left}th{font-size:10px;color:#7697a5;text-transform:uppercase;letter-spacing:.6px}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800}.ok{background:rgba(32,230,163,.12);color:#57edbd}.warn{background:rgba(255,181,46,.12);color:#ffc65e}.crit{background:rgba(255,94,104,.12);color:#ff8189}
+.small{font-size:11px;color:var(--muted)}.empty{padding:30px;text-align:center;color:var(--muted)}
+.planning-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.planning-head h2{margin:0}.week-title{font-weight:800;font-size:14px;color:#cfe8f1}
+.planning-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.week-grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:16px;background:#06151e}
+.week-grid{min-width:1120px}
+.week-row{display:grid;grid-template-columns:180px repeat(7,minmax(125px,1fr));border-bottom:1px solid rgba(103,182,211,.10)}
+.week-row:last-child{border-bottom:0}.week-cell{padding:9px;border-right:1px solid rgba(103,182,211,.10);min-height:100px}.week-cell:last-child{border-right:0}
+.week-head{background:#081d28;min-height:62px;font-weight:800;text-align:center;color:#bfe1eb;text-transform:capitalize}.week-head small{display:block;color:#648895;font-weight:600;margin-top:4px}
+.team-band{grid-column:1/-1;padding:11px 13px;font-weight:850;font-size:14px;background:linear-gradient(90deg,rgba(32,230,163,.13),transparent);color:#4eeabd;border-top:1px solid rgba(32,230,163,.16)}
+.team-band.t2{background:linear-gradient(90deg,rgba(255,181,46,.12),transparent);color:#ffc65e}
+.person-cell{background:rgba(7,25,34,.72);font-weight:800;color:#d8edf3}.person-cell small{display:block;color:#668b99;font-weight:500;margin-top:4px}
+.event{border-radius:12px;padding:9px;margin-bottom:7px;border:1px solid rgba(32,230,163,.28);background:linear-gradient(145deg,rgba(16,101,79,.45),rgba(8,52,45,.45));box-shadow:0 7px 20px rgba(0,0,0,.16)}
+.event.rdv{background:linear-gradient(145deg,rgba(22,91,140,.45),rgba(9,47,76,.45));border-color:rgba(39,200,255,.35)}
+.event.prepa{background:linear-gradient(145deg,rgba(129,86,16,.40),rgba(71,46,9,.40));border-color:rgba(255,181,46,.35)}
+.event.abs{background:linear-gradient(145deg,rgba(123,35,47,.42),rgba(65,20,29,.42));border-color:rgba(255,94,104,.35)}
+.event.autre{background:linear-gradient(145deg,rgba(82,52,141,.42),rgba(46,29,83,.42));border-color:rgba(166,108,255,.35)}
+.event-time{font-size:10px;font-weight:850;color:#bce8d9}.event-title{font-weight:800;font-size:12px;margin-top:4px}.event-meta{font-size:10px;color:#9eb9c4;margin-top:4px;line-height:1.35}
+.event-del{float:right;border:0;background:transparent;color:#ff7e87;padding:0 2px;font-size:15px;box-shadow:none}
+.team-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.summary-card b{font-size:20px}.summary-card span{display:block;font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase}
+.legend{display:flex;gap:13px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+nav{
+  position:fixed;z-index:100;bottom:12px;left:50%;transform:translateX(-50%);width:min(720px,calc(100% - 20px));
+  background:rgba(7,22,31,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(103,182,211,.20);border-radius:20px;padding:7px;
+  box-shadow:0 18px 50px rgba(0,0,0,.45);display:flex;gap:4px
+}
+nav .navbtn{
+  flex:1;color:#6f909e;padding:9px 4px;font-size:11px;border-radius:14px;text-decoration:none;text-align:center;
+  display:block;cursor:pointer;border:0;font-weight:750
+}
+nav .navbtn.active{color:#65efc0;background:rgba(32,230,163,.10);box-shadow:inset 0 0 0 1px rgba(32,230,163,.12)}
+nav .navbtn:first-letter{font-size:17px}
+@media(min-width:900px){
+  body{padding-bottom:30px}
+  nav{position:fixed;left:20px;top:96px;bottom:20px;transform:none;width:76px;display:flex;flex-direction:column;border-radius:20px;padding:8px}
+  nav .navbtn{flex:none;min-height:68px;display:grid;place-items:center;line-height:1.25}
+  main{padding-left:115px;padding-right:24px}
+  header .brand{padding-left:115px}
+}
+@media(max-width:700px){
+  .cards{grid-template-columns:repeat(2,1fr)}.row,.row3{grid-template-columns:1fr}
+  .hero h2{font-size:24px}.hero{padding:20px}
+}
+@media(max-width:430px){.cards{grid-template-columns:repeat(2,1fr)}.card{padding:13px}.card .num{font-size:24px}.section{padding:14px}.team-summary{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-mark">🌱</div>
+    <div><h1>Stock BTP</h1><div class="sub">L’énergie d’un avenir durable • gestion intelligente des chantiers</div></div>
+  </div>
+</header>
+<main>
+<section id="tab-stock" class="tab active">
+  <div class="hero">
+    <h2>Bonjour Damien ☀️</h2>
+    <p>Pilote tes équipes, ton matériel et tes chantiers depuis un seul espace.</p>
+    <div class="energy-line"><i></i> Plateforme BTP • Photovoltaïque • IRVE • Électricité</div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="num" id="nbArticles">0</div><div class="label">Articles</div></div>
+    <div class="card"><div class="num" id="nbCommander">0</div><div class="label">À commander</div></div>
+    <div class="card"><div class="num" id="nbMouv">0</div><div class="label">Mouvements</div></div>
+  </div>
+  <div class="toolbar"><input id="search" class="search" placeholder="🔎 Rechercher matériel ou référence" oninput="render()"><button onclick="openMovement('Entrée')">➕ Entrée</button><button onclick="openMovement('Sortie')">➖ Sortie</button></div>
+  <div class="section"><h2>Stock actuel</h2><div id="stockTable"></div></div>
+</section>
+
+<section id="tab-mouvements" class="tab">
+  <div class="section"><h2>Ajouter un mouvement</h2>
+    <div class="row3">
+      <div class="field"><label>Type</label><select id="mvType"><option>Entrée</option><option>Sortie</option></select></div>
+      <div class="field"><label>Matériel</label><select id="mvMat"></select></div>
+      <div class="field"><label>Quantité</label><input id="mvQty" type="number" min="0.01" step="0.01"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>N° chantier (obligatoire pour une sortie)</label><input id="mvChantier" placeholder="Ex : CH-2026-123"></div>
+      <div class="field"><label>Commentaire</label><input id="mvComment" placeholder="Ex : pose borne IRVE"></div>
+    </div>
+    <div class="actions"><button onclick="addMovement()">Enregistrer le mouvement</button></div>
+  </div>
+  <div class="section"><h2>Historique</h2><div id="movementTable"></div></div>
+</section>
+
+<section id="tab-materiel" class="tab">
+  <div class="section"><h2>Ajouter / modifier du matériel</h2>
+    <input type="hidden" id="editIndex">
+    <div class="row">
+      <div class="field"><label>Matériel</label><input id="mName"></div>
+      <div class="field"><label>Référence</label><input id="mRef"></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Catégorie</label><input id="mCat"></div>
+      <div class="field"><label>Unité</label><input id="mUnit" placeholder="pcs, m..."></div>
+      <div class="field"><label>Stock mini</label><input id="mMin" type="number" min="0" step="1"></div>
+    </div>
+    <div class="actions"><button class="secondary" onclick="clearMaterialForm()">Effacer</button><button onclick="saveMaterial()">Enregistrer</button></div>
+  </div>
+  <div class="section"><h2>Liste matériel</h2><div id="materialTable"></div></div>
+</section>
+
+<section id="tab-planning" class="tab">
+  <div class="cards">
+    <div class="card"><div class="num">☀️</div><div class="label">Énergie solaire</div><div class="accent">Production & chantiers PV</div></div>
+    <div class="card"><div class="num">⚡</div><div class="label">IRVE</div><div class="accent">Bornes & raccordements</div></div>
+    <div class="card"><div class="num">🔋</div><div class="label">Stock intelligent</div><div class="accent">Matériel disponible</div></div>
+    <div class="card"><div class="num">♻️</div><div class="label">Avenir durable</div><div class="accent">Organisation optimisée</div></div>
+  </div>
+  <div class="section">
+    <div class="planning-head">
+      <div>
+        <h2>⚡ Planning des équipes</h2>
+        <div class="small">Organisez les équipes et construisez l’énergie de demain</div>
+      </div>
+      <div class="planning-controls">
+        <button class="secondary" onclick="planningPrevWeek()">‹</button>
+        <button class="secondary" onclick="planningToday()">Aujourd'hui</button>
+        <button class="secondary" onclick="planningNextWeek()">›</button>
+        <span id="weekTitle" class="week-title"></span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <select id="plFilterTeam" onchange="renderPlanningGrid()">
+        <option value="all">Toutes les équipes</option>
+        <option value="1">Équipe 1</option>
+        <option value="2">Équipe 2</option>
+      </select>
+      <select id="plFilterType" onchange="renderPlanningGrid()">
+        <option value="all">Tous les types</option>
+        <option value="chantier">Chantier</option>
+        <option value="rdv">Rendez-vous</option>
+        <option value="prepa">Préparation</option>
+        <option value="abs">Absence</option>
+        <option value="autre">Autre</option>
+      </select>
+    </div>
+
+    <div class="week-grid-wrap"><div id="planningGrid" class="week-grid"></div></div>
+    <div class="legend">
+      <span><i class="dot" style="background:#5abf7a"></i>Chantier</span>
+      <span><i class="dot" style="background:#5b9cf6"></i>Rendez-vous</span>
+      <span><i class="dot" style="background:#e6a52e"></i>Préparation</span>
+      <span><i class="dot" style="background:#e46b64"></i>Absence</span>
+      <span><i class="dot" style="background:#9467d9"></i>Autre</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>➕ Ajouter au planning</h2>
+    <div class="row">
+      <div class="field"><label>Équipe</label>
+        <select id="plTeam"><option value="1">Équipe 1</option><option value="2">Équipe 2</option></select>
+      </div>
+      <div class="field"><label>Personne</label><input id="plNom" placeholder="Ex : Damien"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Date</label><input id="plDate" type="date"></div>
+      <div class="field"><label>Type</label>
+        <select id="plType"><option value="chantier">Chantier</option><option value="rdv">Rendez-vous</option><option value="prepa">Préparation</option><option value="abs">Absence</option><option value="autre">Autre</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Heure début</label><input id="plDebut" type="time" value="08:00"></div>
+      <div class="field"><label>Heure fin</label><input id="plFin" type="time" value="17:00"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Chantier / rendez-vous</label><input id="plChantier" placeholder="Ex : Installation borne IRVE / RDV client"></div>
+      <div class="field"><label>Lieu</label><input id="plLieu" placeholder="Ex : Lille"></div>
+    </div>
+    <div class="field"><label>Détail / consigne</label><input id="plNote" placeholder="Matériel, client, consigne, adresse..."></div>
+    <div class="actions"><button class="secondary" onclick="clearPlanningForm()">Effacer</button><button onclick="addPlanning()">Ajouter</button></div>
+  </div>
+
+  <div class="team-summary">
+    <div class="summary-card"><b id="sumTeam1">0</b><span>Équipe 1 — événements</span></div>
+    <div class="summary-card"><b id="sumTeam2">0</b><span>Équipe 2 — événements</span></div>
+    <div class="summary-card"><b id="sumRdv">0</b><span>Rendez-vous</span></div>
+    <div class="summary-card"><b id="sumHours">0 h</b><span>Heures planifiées</span></div>
+  </div>
+</section>
+
+<section id="tab-outils" class="tab">
+  <div class="section"><h2>⚙️ Sauvegarde</h2>
+    <p class="small">Les modifications sont enregistrées automatiquement sur cet appareil. Fais régulièrement une sauvegarde JSON.</p>
+    <div class="toolbar"><button onclick="backup()">💾 Sauvegarder</button><button class="secondary" onclick="document.getElementById('fileIn').click()">↥ Restaurer</button><button class="danger" onclick="resetData()">Réinitialiser</button></div>
+    <input id="fileIn" type="file" accept=".json" style="display:none" onchange="restore(event)">
+  </div>
+  <div class="section"><h2>📱 Installation sur l’écran d’accueil</h2>
+    <p>Ouvre cette page dans Safari, puis <b>Partager → Sur l’écran d’accueil</b>. L’icône pourra ensuite être utilisée comme une application.</p>
+    <p class="small">Pour conserver les données, utilise le bouton « Sauvegarder » avant de changer d’appareil ou de navigateur.</p>
+  </div>
+</section>
+</main>
+<nav>
+<a href="#stock" id="n-stock" class="navbtn active" data-tab="stock">📦<br>Stock</a>
+<a href="#mouvements" id="n-mouvements" class="navbtn" data-tab="mouvements">↕️<br>Mouvements</a>
+<a href="#materiel" id="n-materiel" class="navbtn" data-tab="materiel">🧰<br>Matériel</a>
+<a href="#planning" id="n-planning" class="navbtn" data-tab="planning">📅<br>Planning</a>
+<a href="#outils" id="n-outils" class="navbtn" data-tab="outils">⚙️<br>Outils</a>
+</nav>
+
+<script>
+const SEED = {"materials": [{"name": "Attache tube", "ref": "ATT-TUBE", "cat": "Fixation", "unit": "pcs", "min": 50}, {"name": "MC4 femelle", "ref": "MC4-F", "cat": "Solaire", "unit": "pcs", "min": 20}, {"name": "MC4 mâle", "ref": "MC4-M", "cat": "Solaire", "unit": "pcs", "min": 20}, {"name": "Bornier de répartition", "ref": "BOR-R", "cat": "Tableau électrique", "unit": "pcs", "min": 5}, {"name": "Câble PV rouge", "ref": "CABLE-PV-R", "cat": "Solaire", "unit": "m", "min": 50}, {"name": "Câble PV noir", "ref": "CABLE-PV-N", "cat": "Solaire", "unit": "m", "min": 50}, {"name": "Tableau 18 modules", "ref": "TABLEAU-18M", "cat": "Tableau électrique", "unit": "pcs", "min": 2}, {"name": "Tableau 18 modules étanche", "ref": "TABLEAU-18M-ET", "cat": "Tableau électrique", "unit": "pcs", "min": 2}, {"name": "Attache panneau externe", "ref": "ATT-PAN-EXT", "cat": "Fixation photovoltaïque", "unit": "pcs", "min": 20}, {"name": "Attache panneau centrale", "ref": "ATT-PAN-CEN", "cat": "Fixation photovoltaïque", "unit": "pcs", "min": 20}, {"name": "Bornier de répartition marron", "ref": "BOR-R-MAR", "cat": "Tableau électrique", "unit": "pcs", "min": 5}, {"name": "Bornier de répartition bleu", "ref": "BOR-R-BLEU", "cat": "Tableau électrique", "unit": "pcs", "min": 5}, {"name": "Différentiel 40A type F ou B monophasé", "ref": "DIFF-40A-FB-MONO", "cat": "Protection électrique", "unit": "pcs", "min": 2}, {"name": "Différentiel 40A type F ou B triphasé", "ref": "DIFF-40A-FB-TRI", "cat": "Protection électrique", "unit": "pcs", "min": 2}, {"name": "Câble 5G10 mm²", "ref": "CABLE-5G10", "cat": "Câble électrique", "unit": "m", "min": 50}, {"name": "Câble 3G10 mm²", "ref": "CABLE-3G10", "cat": "Câble électrique", "unit": "m", "min": 50}, {"name": "Répéteur Wi-Fi 6", "ref": "REP-WIFI6", "cat": "Réseau / communication", "unit": "pcs", "min": 2}, {"name": "CPL", "ref": "CPL", "cat": "Réseau / communication", "unit": "pcs", "min": 2}, {"name": "Câble souple 1 paire 0,75 mm²", "ref": "CABLE-SOUPLE-1P075", "cat": "Câble électrique", "unit": "m", "min": 50}, {"name": "Gaine Ø25 mm", "ref": "GAINE-25", "cat": "Gaine / tube", "unit": "m", "min": 20}, {"name": "Tube IRL Ø25 mm", "ref": "IRL-25", "cat": "Tube / gaine", "unit": "m", "min": 20}, {"name": "Tube IRL Ø30 mm", "ref": "IRL-30", "cat": "Tube / gaine", "unit": "m", "min": 20}], "initial": {"Attache tube": 50, "MC4 femelle": 0, "MC4 mâle": 0, "Bornier de répartition": 0, "Câble PV rouge": 0, "Câble PV noir": 0, "Tableau 18 modules": 0, "Tableau 18 modules étanche": 0, "Attache panneau externe": 0, "Attache panneau centrale": 0, "Bornier de répartition marron": 0, "Bornier de répartition bleu": 0, "Différentiel 40A type F ou B monophasé": 0, "Différentiel 40A type F ou B triphasé": 0, "Câble 5G10 mm²": 0, "Câble 3G10 mm²": 0, "Répéteur Wi-Fi 6": 0, "CPL": 0, "Câble souple 1 paire 0,75 mm²": 0, "Gaine Ø25 mm": 0, "Tube IRL Ø25 mm": 0, "Tube IRL Ø30 mm": 0}, "movements": []};
+const KEY = "stock_btp_app_v1";
+let data = load();
+
+function load(){try{const x=localStorage.getItem(KEY);let d=x?JSON.parse(x):structuredClone(SEED);d.planning=d.planning||[];d.planning=d.planning.map(x=>({...x,team:String(x.team||'1'),type:x.type||'chantier'}));return d}catch(e){const d=structuredClone(SEED);d.planning=[];return d}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function stockOf(name){let n=Number(data.initial[name]||0); for(const m of data.movements){if(m.material===name)n += m.type==="Entrée"?Number(m.qty): -Number(m.qty)} return n}
+function state(s,min){if(s<=min){if(s<=0)return ['CRITIQUE','crit'];return ['COMMANDER','warn']}return ['OK','ok']}
+function tab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('nav .navbtn').forEach(x=>x.classList.remove('active'));document.getElementById('n-'+t).classList.add('active');render()}
+function render(){
+ const q=(document.getElementById('search')?.value||'').toLowerCase();
+ const rows=data.materials.filter(m=>!q||(m.name+' '+m.ref+' '+m.cat).toLowerCase().includes(q));
+ document.getElementById('nbArticles').textContent=data.materials.length;
+ document.getElementById('nbCommander').textContent=data.materials.filter(m=>stockOf(m.name)<=Number(m.min||0)).length;
+ document.getElementById('nbMouv').textContent=data.movements.length;
+ document.getElementById('stockTable').innerHTML=rows.length?`<table><thead><tr><th>Matériel</th><th>Stock</th><th>Mini</th><th>État</th></tr></thead><tbody>${rows.map(m=>{let s=stockOf(m.name),st=state(s,m.min);return `<tr><td><b>${esc(m.name)}</b><br><span class="small">${esc(m.ref)} • ${esc(m.unit)}</span></td><td><b>${s}</b></td><td>${esc(m.min)}</td><td><span class="badge ${st[1]}">${st[0]}</span></td></tr>`}).join('')}</tbody></table>`:'<div class="empty">Aucun matériel trouvé.</div>';
+ const sel=document.getElementById('mvMat'); if(sel){let old=sel.value;sel.innerHTML=data.materials.map(m=>`<option>${esc(m.name)}</option>`).join('');if(old)sel.value=old}
+ document.getElementById('movementTable').innerHTML=data.movements.length?`<table><thead><tr><th>Date</th><th>Matériel</th><th>Type</th><th>Qté</th><th>Chantier</th></tr></thead><tbody>${[...data.movements].reverse().map((m,i)=>`<tr><td>${esc(m.date)}</td><td>${esc(m.material)}</td><td>${m.type==='Sortie'?'➖ Sortie':'➕ Entrée'}</td><td>${esc(m.qty)}</td><td>${esc(m.chantier)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Aucun mouvement.</div>';
+ document.getElementById('materialTable').innerHTML=`<table><thead><tr><th>Matériel</th><th>Référence</th><th>Mini</th><th></th></tr></thead><tbody>${data.materials.map((m,i)=>`<tr><td>${esc(m.name)}<br><span class="small">${esc(m.cat)} • ${esc(m.unit)}</span></td><td>${esc(m.ref)}</td><td>${esc(m.min)}</td><td><button class="secondary" onclick="editMaterial(${i})">✏️</button></td></tr>`).join('')}</tbody></table>`;
+ renderPlanningGrid();
+}
+function openMovement(type){tab('mouvements');document.getElementById('mvType').value=type;document.getElementById('mvQty').focus()}
+function addMovement(){
+ const type=document.getElementById('mvType').value, material=document.getElementById('mvMat').value, qty=Number(document.getElementById('mvQty').value), chantier=document.getElementById('mvChantier').value.trim(), comment=document.getElementById('mvComment').value.trim();
+ if(!material||!qty||qty<=0){alert('Choisis un matériel et une quantité valide.');return}
+ if(type==='Sortie'&&!chantier){alert('Le N° de chantier est obligatoire pour une sortie.');return}
+ if(type==='Sortie'&&qty>stockOf(material)){if(!confirm('La quantité demandée dépasse le stock actuel. Continuer ?'))return}
+ data.movements.push({date:new Date().toISOString().slice(0,10),material,type,qty,chantier,comment});save();
+ document.getElementById('mvQty').value='';document.getElementById('mvChantier').value='';document.getElementById('mvComment').value='';render();alert('Mouvement enregistré ✅');
+}
+function clearMaterialForm(){['mName','mRef','mCat','mUnit','mMin','editIndex'].forEach(id=>document.getElementById(id).value='')}
+function editMaterial(i){let m=data.materials[i];document.getElementById('editIndex').value=i;document.getElementById('mName').value=m.name;document.getElementById('mRef').value=m.ref;document.getElementById('mCat').value=m.cat;document.getElementById('mUnit').value=m.unit;document.getElementById('mMin').value=m.min;window.scrollTo({top:0,behavior:'smooth'})}
+function saveMaterial(){
+ const name=document.getElementById('mName').value.trim(), ref=document.getElementById('mRef').value.trim(), cat=document.getElementById('mCat').value.trim(), unit=document.getElementById('mUnit').value.trim()||'pcs', min=Number(document.getElementById('mMin').value||0), idx=document.getElementById('editIndex').value;
+ if(!name){alert('Le nom du matériel est obligatoire.');return}
+ if(idx===''){if(data.materials.some(m=>m.name.toLowerCase()===name.toLowerCase())){alert('Ce matériel existe déjà.');return}data.materials.push({name,ref,cat,unit,min});data.initial[name]=0}
+ else {let old=data.materials[Number(idx)].name;if(old!==name){data.initial[name]=data.initial[old]||0;data.movements.forEach(m=>{if(m.material===old)m.material=name});delete data.initial[old]}data.materials[Number(idx)]={name,ref,cat,unit,min}}
+ save();clearMaterialForm();render();alert('Matériel enregistré ✅');
+}
+function isoDate(d){
+  const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+  return x.toISOString().slice(0,10);
+}
+function mondayOf(d){
+  const x=new Date(d); x.setHours(12,0,0,0);
+  const day=x.getDay()||7; x.setDate(x.getDate()-day+1); return x;
+}
+let planningWeekStart=mondayOf(new Date());
+
+function planningDays(){
+  const out=[];
+  for(let i=0;i<7;i++){const d=new Date(planningWeekStart);d.setDate(d.getDate()+i);out.push(d)}
+  return out;
+}
+function fmtDay(d){return d.toLocaleDateString('fr-FR',{weekday:'long'})}
+function fmtShort(d){return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}
+function weekLabel(){
+  const ds=planningDays();
+  return `${ds[0].toLocaleDateString('fr-FR',{day:'2-digit',month:'long'})} – ${ds[6].toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}`;
+}
+function planningPrevWeek(){planningWeekStart.setDate(planningWeekStart.getDate()-7);renderPlanningGrid()}
+function planningNextWeek(){planningWeekStart.setDate(planningWeekStart.getDate()+7);renderPlanningGrid()}
+function planningToday(){planningWeekStart=mondayOf(new Date());document.getElementById('plDate').value=isoDate(new Date());renderPlanningGrid()}
+function typeLabel(t){return ({chantier:'Chantier',rdv:'Rendez-vous',prepa:'Préparation',abs:'Absence',autre:'Autre'})[t]||'Autre'}
+function teamName(t){return t==='2'?'Équipe 2':'Équipe 1'}
+
+function addPlanning(){
+ const team=document.getElementById('plTeam').value;
+ const date=document.getElementById('plDate').value;
+ const nom=document.getElementById('plNom').value.trim();
+ const type=document.getElementById('plType').value;
+ const chantier=document.getElementById('plChantier').value.trim();
+ const lieu=document.getElementById('plLieu').value.trim();
+ const debut=document.getElementById('plDebut').value;
+ const fin=document.getElementById('plFin').value;
+ const note=document.getElementById('plNote').value.trim();
+ if(!date||!nom||!chantier){alert('La date, la personne et le chantier / rendez-vous sont obligatoires.');return}
+ data.planning.push({date,nom,chantier,lieu,debut,fin,role:'',note,team,type});
+ save(); planningWeekStart=mondayOf(new Date(date+'T12:00:00')); clearPlanningForm(); render(); alert('Événement ajouté au planning ✅');
+}
+function clearPlanningForm(){
+ const today=isoDate(new Date());
+ document.getElementById('plDate').value=today;
+ document.getElementById('plNom').value='';
+ document.getElementById('plChantier').value='';
+ document.getElementById('plLieu').value='';
+ document.getElementById('plDebut').value='08:00';
+ document.getElementById('plFin').value='17:00';
+ document.getElementById('plNote').value='';
+ document.getElementById('plTeam').value='1';
+ document.getElementById('plType').value='chantier';
+}
+function deletePlanning(i){if(confirm('Supprimer cet événement du planning ?')){data.planning.splice(i,1);save();render()}}
+function eventHours(x){
+ const a=x.debut||'00:00',b=x.fin||a;
+ const [ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);
+ let mins=(bh*60+bm)-(ah*60+am); if(mins<0)mins=0; return mins/60;
+}
+function renderPlanningGrid(){
+ const root=document.getElementById('planningGrid'); if(!root)return;
+ const teamFilter=document.getElementById('plFilterTeam').value;
+ const typeFilter=document.getElementById('plFilterType').value;
+ const days=planningDays();
+ document.getElementById('weekTitle').textContent=weekLabel();
+
+ const dayKeys=days.map(isoDate);
+ let arr=(data.planning||[]).map((x,i)=>({...x,_i:i,team:String(x.team||'1'),type:x.type||'chantier'}))
+   .filter(x=>dayKeys.includes(x.date))
+   .filter(x=>teamFilter==='all'||x.team===teamFilter)
+   .filter(x=>typeFilter==='all'||x.type===typeFilter);
+
+ let h='<div class="week-row">';
+ h+='<div class="week-cell week-head">Équipe / personne</div>';
+ for(const d of days) h+=`<div class="week-cell week-head">${fmtDay(d)}<small>${fmtShort(d)}</small></div>`;
+ h+='</div>';
+
+ const teams=[['1','Équipe 1'],['2','Équipe 2']];
+ for(const [teamId,label] of teams){
+   if(teamFilter!=='all'&&teamFilter!==teamId)continue;
+   const names=[...new Set(arr.filter(x=>x.team===teamId).map(x=>x.nom))];
+   const allNames=[...new Set((data.planning||[]).filter(x=>String(x.team||'1')===teamId).map(x=>x.nom))];
+   const people=names.length?names:allNames;
+   h+=`<div class="week-row"><div class="team-band ${teamId==='2'?'t2':''}">${label}</div></div>`;
+   if(!people.length) people.push(teamId==='1'?'Affectation libre':'Affectation libre');
+   for(const person of people){
+     h+='<div class="week-row"><div class="week-cell person-cell">'+htmlEsc(person)+'<small>Équipe '+teamId+'</small></div>';
+     for(const d of days){
+       const key=isoDate(d);
+       const events=arr.filter(x=>x.team===teamId&&x.nom===person&&x.date===key);
+       h+='<div class="week-cell">';
+       for(const x of events){
+         const cls=['chantier','rdv','prepa','abs','autre'].includes(x.type)?x.type:'autre';
+         h+=`<div class="event ${cls}">
+           <button class="event-del" onclick="deletePlanning(${x._i})">×</button>
+           <div class="event-time">${htmlEsc(x.debut||'')} ${x.fin?'– '+htmlEsc(x.fin):''}</div>
+           <div class="event-title">${htmlEsc(x.chantier)}</div>
+           <div class="event-meta">${htmlEsc(typeLabel(x.type))}${x.lieu?' • '+htmlEsc(x.lieu):''}${x.note?' • '+htmlEsc(x.note):''}</div>
+         </div>`;
+       }
+       if(!events.length) h+='<span class="small">—</span>';
+       h+='</div>';
+     }
+     h+='</div>';
+   }
+ }
+ root.innerHTML=h;
+
+ const all=(data.planning||[]);
+ const visible=all.filter(x=>dayKeys.includes(x.date));
+ document.getElementById('sumTeam1').textContent=visible.filter(x=>String(x.team||'1')==='1').length;
+ document.getElementById('sumTeam2').textContent=visible.filter(x=>String(x.team||'1')==='2').length;
+ document.getElementById('sumRdv').textContent=visible.filter(x=>(x.type||'chantier')==='rdv').length;
+ const hrs=visible.reduce((n,x)=>n+eventHours(x),0);
+ document.getElementById('sumHours').textContent=(Math.round(hrs*10)/10)+' h';
+}
+function htmlEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function backup(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sauvegarde_stock_btp.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function restore(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.materials||!x.movements)throw 0;data=x;save();render();alert('Sauvegarde restaurée ✅')}catch(e){alert('Fichier de sauvegarde invalide.')}};r.readAsText(f)}
+function resetData(){if(confirm('Supprimer toutes les modifications et revenir aux données de départ ?')){localStorage.removeItem(KEY);data=load();render()}}
+document.addEventListener('click', function(e){
+  const a=e.target.closest && e.target.closest('.navbtn');
+  if(a){ e.preventDefault(); tab(a.dataset.tab); history.replaceState(null,'','#'+a.dataset.tab); }
+});
+window.addEventListener('hashchange', function(){
+  const t=location.hash.replace('#','');
+  if(['stock','mouvements','materiel','planning','outils'].includes(t)) tab(t);
+});
+clearPlanningForm();
+render();
+</script>
+</body>
+</html>
