@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0b5cab">
+<title>Stock BTP</title>
+<style>
+:root{--blue:#0b5cab;--bg:#f4f6f8;--card:#fff;--text:#17202a;--muted:#6b7280;--border:#dfe4ea;--danger:#d92d20;--ok:#087443;--orange:#b54708}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:110px}
+header{position:sticky;top:0;z-index:5;background:var(--blue);color:white;padding:15px 16px calc(13px + env(safe-area-inset-top));padding-top:calc(13px + env(safe-area-inset-top));box-shadow:0 2px 8px #0002}
+h1{font-size:21px;margin:0 0 3px}.sub{font-size:12px;opacity:.85}
+main{max-width:900px;margin:auto;padding:14px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px}.num{font-size:24px;font-weight:750}.label{font-size:12px;color:var(--muted)}
+.toolbar{display:flex;gap:8px;margin:13px 0;flex-wrap:wrap}input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:white;font-size:16px}button{border:0;border-radius:10px;padding:11px 14px;font-size:15px;font-weight:650;background:var(--blue);color:white}button.secondary{background:#e8eef5;color:#123}button.danger{background:#fff0ef;color:var(--danger);border:1px solid #ffd0cc}.search{flex:1;min-width:220px}
+.section{background:white;border:1px solid var(--border);border-radius:14px;margin:12px 0;padding:14px}.section h2{font-size:17px;margin:0 0 12px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px 7px;border-bottom:1px solid var(--border);text-align:left}th{font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}.ok{background:#e8f7ef;color:var(--ok)}.warn{background:#fff4e5;color:var(--orange)}.crit{background:#ffebe9;color:var(--danger)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;padding:8px max(8px,env(safe-area-inset-left)) calc(12px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-right));box-shadow:0 -2px 10px #0001;min-height:76px;touch-action:manipulation}
+nav button{min-height:58px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}nav button,nav .navbtn{flex:1;background:transparent;color:#59636f;padding:8px 4px;font-size:13px;border-radius:12px;position:relative;z-index:20;text-decoration:none;text-align:center;display:block;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border:0;font-weight:650}nav button.active{color:var(--blue);background:#edf5ff}
+.tab{display:none}.tab.active{display:block}
+.small{font-size:12px;color:var(--muted)}.empty{padding:25px;text-align:center;color:var(--muted)}
+@media(max-width:650px){.cards{grid-template-columns:repeat(3,1fr)}.row,.row3{grid-template-columns:1fr}.desktop{display:none}th,td{padding:9px 5px}}
+</style>
+</head>
+<body>
+<header><h1>📦 Stock BTP</h1><div class="sub">Gestion du matériel • iPad / iPhone</div></header>
+<main>
+<section id="tab-stock" class="tab active">
+  <div class="cards">
+    <div class="card"><div class="num" id="nbArticles">0</div><div class="label">Articles</div></div>
+    <div class="card"><div class="num" id="nbCommander">0</div><div class="label">À commander</div></div>
+    <div class="card"><div class="num" id="nbMouv">0</div><div class="label">Mouvements</div></div>
+  </div>
+  <div class="toolbar"><input id="search" class="search" placeholder="🔎 Rechercher matériel ou référence" oninput="render()"><button onclick="openMovement('Entrée')">➕ Entrée</button><button onclick="openMovement('Sortie')">➖ Sortie</button></div>
+  <div class="section"><h2>Stock actuel</h2><div id="stockTable"></div></div>
+</section>
+
+<section id="tab-mouvements" class="tab">
+  <div class="section"><h2>Ajouter un mouvement</h2>
+    <div class="row3">
+      <div class="field"><label>Type</label><select id="mvType"><option>Entrée</option><option>Sortie</option></select></div>
+      <div class="field"><label>Matériel</label><select id="mvMat"></select></div>
+      <div class="field"><label>Quantité</label><input id="mvQty" type="number" min="0.01" step="0.01"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>N° chantier (obligatoire pour une sortie)</label><input id="mvChantier" placeholder="Ex : CH-2026-123"></div>
+      <div class="field"><label>Commentaire</label><input id="mvComment" placeholder="Ex : pose borne IRVE"></div>
+    </div>
+    <div class="actions"><button onclick="addMovement()">Enregistrer le mouvement</button></div>
+  </div>
+  <div class="section"><h2>Historique</h2><div id="movementTable"></div></div>
+</section>
+
+<section id="tab-materiel" class="tab">
+  <div class="section"><h2>Ajouter / modifier du matériel</h2>
+    <input type="hidden" id="editIndex">
+    <div class="row">
+      <div class="field"><label>Matériel</label><input id="mName"></div>
+      <div class="field"><label>Référence</label><input id="mRef"></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Catégorie</label><input id="mCat"></div>
+      <div class="field"><label>Unité</label><input id="mUnit" placeholder="pcs, m..."></div>
+      <div class="field"><label>Stock mini</label><input id="mMin" type="number" min="0" step="1"></div>
+    </div>
+    <div class="actions"><button class="secondary" onclick="clearMaterialForm()">Effacer</button><button onclick="saveMaterial()">Enregistrer</button></div>
+  </div>
+  <div class="section"><h2>Liste matériel</h2><div id="materialTable"></div></div>
+</section>
+
+<section id="tab-planning" class="tab">
+<div class="section"><h2>📅 Planning des gars</h2>
+<div class="row"><div class="field"><label>Jour</label><input id="plDate" type="date"></div><div class="field"><label>Nom du gars</label><input id="plNom" placeholder="Ex : Thomas"></div></div>
+<div class="row"><div class="field"><label>Chantier</label><input id="plChantier" placeholder="Ex : CH-2026-123"></div><div class="field"><label>Lieu</label><input id="plLieu" placeholder="Ex : Lille"></div></div>
+<div class="row3"><div class="field"><label>Début</label><input id="plDebut" type="time" value="08:00"></div><div class="field"><label>Fin</label><input id="plFin" type="time" value="17:00"></div><div class="field"><label>Rôle</label><input id="plRole" placeholder="Électricien"></div></div>
+<div class="field"><label>Note</label><input id="plNote" placeholder="Matériel, consigne, rendez-vous..."></div>
+<div class="actions"><button class="secondary" onclick="clearPlanningForm()">Effacer</button><button onclick="addPlanning()">Ajouter au planning</button></div>
+</div>
+<div class="section"><h2>Planning</h2><div id="planningTable"></div></div>
+</section>
+
+<section id="tab-outils" class="tab">
+  <div class="section"><h2>⚙️ Sauvegarde</h2>
+    <p class="small">Les modifications sont enregistrées automatiquement sur cet appareil. Fais régulièrement une sauvegarde JSON.</p>
+    <div class="toolbar"><button onclick="backup()">💾 Sauvegarder</button><button class="secondary" onclick="document.getElementById('fileIn').click()">↥ Restaurer</button><button class="danger" onclick="resetData()">Réinitialiser</button></div>
+    <input id="fileIn" type="file" accept=".json" style="display:none" onchange="restore(event)">
+  </div>
+  <div class="section"><h2>📱 Installation sur l’écran d’accueil</h2>
+    <p>Ouvre cette page dans Safari, puis <b>Partager → Sur l’écran d’accueil</b>. L’icône pourra ensuite être utilisée comme une application.</p>
+    <p class="small">Pour conserver les données, utilise le bouton « Sauvegarder » avant de changer d’appareil ou de navigateur.</p>
+  </div>
+</section>
+</main>
+<nav>
+<a href="#stock" id="n-stock" class="navbtn active" data-tab="stock">📦<br>Stock</a>
+<a href="#mouvements" id="n-mouvements" class="navbtn" data-tab="mouvements">↕️<br>Mouvements</a>
+<a href="#materiel" id="n-materiel" class="navbtn" data-tab="materiel">🧰<br>Matériel</a>
+<a href="#planning" id="n-planning" class="navbtn" data-tab="planning">📅<br>Planning</a>
+<a href="#outils" id="n-outils" class="navbtn" data-tab="outils">⚙️<br>Outils</a>
+</nav>
+
+<script>
+const SEED = {"materials": [{"name": "Attache tube", "ref": "ATT-TUBE", "cat": "Fixation", "unit": "pcs", "min": 50}, {"name": "MC4 femelle", "ref": "MC4-F", "cat": "Solaire", "unit": "pcs", "min": 20}, {"name": "MC4 mâle", "ref": "MC4-M", "cat": "Solaire", "unit": "pcs", "min": 20}, {"name": "Bornier de répartition", "ref": "BOR-R", "cat": "Tableau électrique", "unit": "pcs", "min": 5}, {"name": "Câble PV rouge", "ref": "CABLE-PV-R", "cat": "Solaire", "unit": "m", "min": 50}, {"name": "Câble PV noir", "ref": "CABLE-PV-N", "cat": "Solaire", "unit": "m", "min": 50}, {"name": "Tableau 18 modules", "ref": "TABLEAU-18M", "cat": "Tableau électrique", "unit": "pcs", "min": 2}, {"name": "Tableau 18 modules étanche", "ref": "TABLEAU-18M-ET", "cat": "Tableau électrique", "unit": "pcs", "min": 2}, {"name": "Attache panneau externe", "ref": "ATT-PAN-EXT", "cat": "Fixation photovoltaïque", "unit": "pcs", "min": 20}, {"name": "Attache panneau centrale", "ref": "ATT-PAN-CEN", "cat": "Fixation photovoltaïque", "unit": "pcs", "min": 20}, {"name": "Bornier de répartition marron", "ref": "BOR-R-MAR", "cat": "Tableau électrique", "unit": "pcs", "min": 5}, {"name": "Bornier de répartition bleu", "ref": "BOR-R-BLEU", "cat": "Tableau électrique", "unit": "pcs", "min": 5}, {"name": "Différentiel 40A type F ou B monophasé", "ref": "DIFF-40A-FB-MONO", "cat": "Protection électrique", "unit": "pcs", "min": 2}, {"name": "Différentiel 40A type F ou B triphasé", "ref": "DIFF-40A-FB-TRI", "cat": "Protection électrique", "unit": "pcs", "min": 2}, {"name": "Câble 5G10 mm²", "ref": "CABLE-5G10", "cat": "Câble électrique", "unit": "m", "min": 50}, {"name": "Câble 3G10 mm²", "ref": "CABLE-3G10", "cat": "Câble électrique", "unit": "m", "min": 50}, {"name": "Répéteur Wi-Fi 6", "ref": "REP-WIFI6", "cat": "Réseau / communication", "unit": "pcs", "min": 2}, {"name": "CPL", "ref": "CPL", "cat": "Réseau / communication", "unit": "pcs", "min": 2}, {"name": "Câble souple 1 paire 0,75 mm²", "ref": "CABLE-SOUPLE-1P075", "cat": "Câble électrique", "unit": "m", "min": 50}, {"name": "Gaine Ø25 mm", "ref": "GAINE-25", "cat": "Gaine / tube", "unit": "m", "min": 20}, {"name": "Tube IRL Ø25 mm", "ref": "IRL-25", "cat": "Tube / gaine", "unit": "m", "min": 20}, {"name": "Tube IRL Ø30 mm", "ref": "IRL-30", "cat": "Tube / gaine", "unit": "m", "min": 20}], "initial": {"Attache tube": 50, "MC4 femelle": 0, "MC4 mâle": 0, "Bornier de répartition": 0, "Câble PV rouge": 0, "Câble PV noir": 0, "Tableau 18 modules": 0, "Tableau 18 modules étanche": 0, "Attache panneau externe": 0, "Attache panneau centrale": 0, "Bornier de répartition marron": 0, "Bornier de répartition bleu": 0, "Différentiel 40A type F ou B monophasé": 0, "Différentiel 40A type F ou B triphasé": 0, "Câble 5G10 mm²": 0, "Câble 3G10 mm²": 0, "Répéteur Wi-Fi 6": 0, "CPL": 0, "Câble souple 1 paire 0,75 mm²": 0, "Gaine Ø25 mm": 0, "Tube IRL Ø25 mm": 0, "Tube IRL Ø30 mm": 0}, "movements": []};
+const KEY = "stock_btp_app_v1";
+let data = load();
+
+function load(){try{const x=localStorage.getItem(KEY);let d=x?JSON.parse(x):structuredClone(SEED);d.planning=d.planning||[];return d}catch(e){const d=structuredClone(SEED);d.planning=[];return d}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function stockOf(name){let n=Number(data.initial[name]||0); for(const m of data.movements){if(m.material===name)n += m.type==="Entrée"?Number(m.qty): -Number(m.qty)} return n}
+function state(s,min){if(s<=min){if(s<=0)return ['CRITIQUE','crit'];return ['COMMANDER','warn']}return ['OK','ok']}
+function tab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.getElementById('n-'+t).classList.add('active');render()}
+function render(){
+ const q=(document.getElementById('search')?.value||'').toLowerCase();
+ const rows=data.materials.filter(m=>!q||(m.name+' '+m.ref+' '+m.cat).toLowerCase().includes(q));
+ document.getElementById('nbArticles').textContent=data.materials.length;
+ document.getElementById('nbCommander').textContent=data.materials.filter(m=>stockOf(m.name)<=Number(m.min||0)).length;
+ document.getElementById('nbMouv').textContent=data.movements.length;
+ document.getElementById('stockTable').innerHTML=rows.length?`<table><thead><tr><th>Matériel</th><th>Stock</th><th>Mini</th><th>État</th></tr></thead><tbody>${rows.map(m=>{let s=stockOf(m.name),st=state(s,m.min);return `<tr><td><b>${esc(m.name)}</b><br><span class="small">${esc(m.ref)} • ${esc(m.unit)}</span></td><td><b>${s}</b></td><td>${esc(m.min)}</td><td><span class="badge ${st[1]}">${st[0]}</span></td></tr>`}).join('')}</tbody></table>`:'<div class="empty">Aucun matériel trouvé.</div>';
+ const sel=document.getElementById('mvMat'); if(sel){let old=sel.value;sel.innerHTML=data.materials.map(m=>`<option>${esc(m.name)}</option>`).join('');if(old)sel.value=old}
+ document.getElementById('planningTable').innerHTML=data.planning.length?`<table><thead><tr><th>Date</th><th>Gars</th><th>Chantier</th><th>Horaires</th><th>Rôle</th><th></th></tr></thead><tbody>${[...data.planning].sort((a,b)=>(a.date+a.debut).localeCompare(b.date+b.debut)).map(x=>`<tr><td>${esc(x.date)}<br><span class="small">${esc(x.lieu)}</span></td><td><b>${esc(x.nom)}</b></td><td>${esc(x.chantier)}</td><td>${esc(x.debut)}–${esc(x.fin)}</td><td>${esc(x.role)}<br><span class="small">${esc(x.note)}</span></td><td><button class="danger" onclick="deletePlanning(${data.planning.indexOf(x)})">✕</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Aucun planning enregistré.</div>';
+ document.getElementById('movementTable').innerHTML=data.movements.length?`<table><thead><tr><th>Date</th><th>Matériel</th><th>Type</th><th>Qté</th><th>Chantier</th></tr></thead><tbody>${[...data.movements].reverse().map((m,i)=>`<tr><td>${esc(m.date)}</td><td>${esc(m.material)}</td><td>${m.type==='Sortie'?'➖ Sortie':'➕ Entrée'}</td><td>${esc(m.qty)}</td><td>${esc(m.chantier)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Aucun mouvement.</div>';
+ document.getElementById('materialTable').innerHTML=`<table><thead><tr><th>Matériel</th><th>Référence</th><th>Mini</th><th></th></tr></thead><tbody>${data.materials.map((m,i)=>`<tr><td>${esc(m.name)}<br><span class="small">${esc(m.cat)} • ${esc(m.unit)}</span></td><td>${esc(m.ref)}</td><td>${esc(m.min)}</td><td><button class="secondary" onclick="editMaterial(${i})">✏️</button></td></tr>`).join('')}</tbody></table>`;
+}
+function openMovement(type){tab('mouvements');document.getElementById('mvType').value=type;document.getElementById('mvQty').focus()}
+function addMovement(){
+ const type=document.getElementById('mvType').value, material=document.getElementById('mvMat').value, qty=Number(document.getElementById('mvQty').value), chantier=document.getElementById('mvChantier').value.trim(), comment=document.getElementById('mvComment').value.trim();
+ if(!material||!qty||qty<=0){alert('Choisis un matériel et une quantité valide.');return}
+ if(type==='Sortie'&&!chantier){alert('Le N° de chantier est obligatoire pour une sortie.');return}
+ if(type==='Sortie'&&qty>stockOf(material)){if(!confirm('La quantité demandée dépasse le stock actuel. Continuer ?'))return}
+ data.movements.push({date:new Date().toISOString().slice(0,10),material,type,qty,chantier,comment});save();
+ document.getElementById('mvQty').value='';document.getElementById('mvChantier').value='';document.getElementById('mvComment').value='';render();alert('Mouvement enregistré ✅');
+}
+function clearMaterialForm(){['mName','mRef','mCat','mUnit','mMin','editIndex'].forEach(id=>document.getElementById(id).value='')}
+function editMaterial(i){let m=data.materials[i];document.getElementById('editIndex').value=i;document.getElementById('mName').value=m.name;document.getElementById('mRef').value=m.ref;document.getElementById('mCat').value=m.cat;document.getElementById('mUnit').value=m.unit;document.getElementById('mMin').value=m.min;window.scrollTo({top:0,behavior:'smooth'})}
+function saveMaterial(){
+ const name=document.getElementById('mName').value.trim(), ref=document.getElementById('mRef').value.trim(), cat=document.getElementById('mCat').value.trim(), unit=document.getElementById('mUnit').value.trim()||'pcs', min=Number(document.getElementById('mMin').value||0), idx=document.getElementById('editIndex').value;
+ if(!name){alert('Le nom du matériel est obligatoire.');return}
+ if(idx===''){if(data.materials.some(m=>m.name.toLowerCase()===name.toLowerCase())){alert('Ce matériel existe déjà.');return}data.materials.push({name,ref,cat,unit,min});data.initial[name]=0}
+ else {let old=data.materials[Number(idx)].name;if(old!==name){data.initial[name]=data.initial[old]||0;data.movements.forEach(m=>{if(m.material===old)m.material=name});delete data.initial[old]}data.materials[Number(idx)]={name,ref,cat,unit,min}}
+ save();clearMaterialForm();render();alert('Matériel enregistré ✅');
+}
+function addPlanning(){const date=document.getElementById('plDate').value,nom=document.getElementById('plNom').value.trim(),chantier=document.getElementById('plChantier').value.trim(),lieu=document.getElementById('plLieu').value.trim(),debut=document.getElementById('plDebut').value,fin=document.getElementById('plFin').value,role=document.getElementById('plRole').value.trim(),note=document.getElementById('plNote').value.trim();if(!date||!nom||!chantier){alert('Le jour, le nom et le chantier sont obligatoires.');return}data.planning.push({date,nom,chantier,lieu,debut,fin,role,note});save();clearPlanningForm();render();alert('Planning ajouté ✅')}
+function clearPlanningForm(){const d=new Date();const iso=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);document.getElementById('plDate').value=iso;document.getElementById('plNom').value='';document.getElementById('plChantier').value='';document.getElementById('plLieu').value='';document.getElementById('plDebut').value='08:00';document.getElementById('plFin').value='17:00';document.getElementById('plRole').value='';document.getElementById('plNote').value=''}
+function deletePlanning(i){if(confirm('Supprimer cette ligne du planning ?')){data.planning.splice(i,1);save();render()}}
+function backup(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sauvegarde_stock_btp.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function restore(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.materials||!x.movements)throw 0;data=x;save();render();alert('Sauvegarde restaurée ✅')}catch(e){alert('Fichier de sauvegarde invalide.')}};r.readAsText(f)}
+function resetData(){if(confirm('Supprimer toutes les modifications et revenir aux données de départ ?')){localStorage.removeItem(KEY);data=load();render()}}
+document.addEventListener('click', function(e){
+  const a=e.target.closest && e.target.closest('.navbtn');
+  if(a){ e.preventDefault(); tab(a.dataset.tab); history.replaceState(null,'','#'+a.dataset.tab); }
+});
+window.addEventListener('hashchange', function(){
+  const t=location.hash.replace('#','');
+  if(['stock','mouvements','materiel','planning','outils'].includes(t)) tab(t);
+});
+clearPlanningForm();
+render();
+</script>
+</body>
+</html>
